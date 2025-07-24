@@ -9,3 +9,35 @@
    88  kubectl delete pod my-first-deployment-77bdf869fc-92gmv
   ##once you delete the pod as replicas is always 2 means it will create a new pod 
    89  kubectl get pod
+##deployment explanation
+#we apply the file kubectl apply -f dep.yml
+apiVersion: apps/v1 ###deployment api version is apps/v1
+kind: Deployment #we are creating a deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-first-deployment
+  name: my-first-deployment
+spec: #specification of the deployment
+#replicas , selector ,template
+  replicas: 2 
+  selector: #.spec.selector 
+  #.spec.selector.matchLabels kind of match expression 
+    matchLabels:
+      app: my-first-deployment
+      #the label is in key value format
+  strategy: {}
+  template: #isnide the pod we need to create containers 
+  #how this template will be mapped to the pod 
+    metadata:
+      creationTimestamp: null
+      labels: #same label we are using 
+        app: my-first-deployment
+    spec: #this template has an specificattion which contianer the container def 
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
