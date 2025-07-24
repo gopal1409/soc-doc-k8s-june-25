@@ -4,3 +4,23 @@
   ##get service will show you a range from 30 thousand series 
   160  kubectl get svc
   ##copy the node machine dns name in the browser : -0rt number
+#lets check the traffic it is in which pod we will use an phpsysinfo image which show the ip address of the pod in the browser
+[root@ip-172-31-115-211 ~]$  kubectl set image deploy my-first-deployment nginx=nulldevil/phpsysinfo
+deployment.apps/my-first-deployment image updated
+[root@ip-172-31-115-211 ~]$ kubectl describe deploy my-first-deployment
+Pod Template:
+  Labels:  app=my-first-deployment
+  Containers:
+   nginx:
+    Image:         nulldevil/phpsysinfo
+    Port:          80/TCP
+##check the image name has been changed
+#now lets check the ip address of the pod 
+[root@ip-172-31-115-211 ~]$ kubectl get pod -o wide
+NAME                                   READY   STATUS    RESTARTS   AGE     IP             NODE                NOMINATED NODE   READINESS GATES
+my-first-deployment-8464899b9d-6ftj9   1/1     Running   0          93s     192.168.0.12   ip-172-31-115-227   <none>           <none>
+my-first-deployment-8464899b9d-7svh9   1/1     Running   0          93s     192.168.0.11   ip-172-31-115-227   <none>           <none>
+my-first-deployment-8464899b9d-rqh4s   1/1     Running   0          111s    192.168.0.8    ip-172-31-115-227   <none>           <none>
+my-first-deployment-8464899b9d-wsgzx   1/1     Running   0          111s    192.168.0.10   ip-172-31-115-227   <none>           <none>
+my-first-deployment-8464899b9d-zcz2l   1/1     Running   0          111s    192.168.0.4    ip-172-31-115-227   <none>           <none>
+####################refresh the page you will see that the traffic is moving towards different pod after every minutes
