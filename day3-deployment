@@ -1,0 +1,11 @@
+#this will create your first deployment and give you two pod 
+83  kubectl create deployment my-first-deployment --image=nginx --port=80 --replicas=2 --dry-run=client -o yaml
+   84  kubectl create deployment my-first-deployment --image=nginx --port=80 --replicas=2 --dry-run=client -o yaml > dep.yml
+   85  kubectl apply -f dep.yml
+   86  kubectl get deployment
+  ##this will show you two pod attach to your deployment 
+   87  kubectl get pod
+  ##change the pod name your pod name will not be same like mine
+   88  kubectl delete pod my-first-deployment-77bdf869fc-92gmv
+  ##once you delete the pod as replicas is always 2 means it will create a new pod 
+   89  kubectl get pod
