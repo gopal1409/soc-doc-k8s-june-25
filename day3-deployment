@@ -41,3 +41,16 @@ spec: #specification of the deployment
         - containerPort: 80
         resources: {}
 status: {}
+#relationship between dep+rs=pod
+[root@ip-172-31-115-211 ~]$ kubectl get deploy
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+my-first-deployment   2/2     2            2           38m
+[root@ip-172-31-115-211 ~]$ kubectl get rs
+NAME                             DESIRED   CURRENT   READY   AGE
+my-first-deployment-77bdf869fc   2         2         2       38m
+[root@ip-172-31-115-211 ~]$ kubectl get pod
+NAME                                   READY   STATUS    RESTARTS   AGE
+my-first-deployment-77bdf869fc-f9djv   1/1     Running   0          38m
+my-first-deployment-77bdf869fc-rwscn   1/1     Running   0          37m
+my-first-pod                           1/1     Running   0          148m
+[root@ip-172-31-115-211 ~]$
