@@ -25,3 +25,23 @@ sudo -i
    63  kubectl get pod -A -o wide
 ##in the master machin on this particular folder you will find ca certificate authority to communicate with your k8s cluster
    64  cat /root/.kube/config
+###the pod defination 
+###any yaml execute from top to bottom and left to right 
+####kubectl apply -f pod.yml
+apiVersion: v1 ###the pod has an apiversion 
+kind: Pod #we are createing a pod 
+metadata: 
+  creationTimestamp: null
+  labels:
+    run: my-first-pod
+  name: my-first-pod #using metadata we are giving a name to the pod
+spec: #this is the specification of the pod
+  containers: #inside the pod we have containers
+  - image: gopal1409/app:v2 #this is the image we are using for the container
+    name: my-first-pod
+    ports:
+    - containerPort: 8080 #the port that the container will listen on
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
