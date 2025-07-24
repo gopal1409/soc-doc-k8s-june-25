@@ -1,0 +1,6 @@
+#lets expose our application outside k8s cluster using nodeport
+  158  kubectl get deploy
+  159  kubectl expose deploy my-first-deployment --type=NodePort --port=80 --name=my-first-service
+  ##get service will show you a range from 30 thousand series 
+  160  kubectl get svc
+  ##copy the node machine dns name in the browser : -0rt number
