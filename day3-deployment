@@ -85,3 +85,10 @@ kubectl get deploy
 #roll back to specific release
 [root@ip-172-31-115-211 ~]$ kubectl rollout undo deployment my-first-deployment --to-revision=1
 deployment.apps/my-first-deployment rolled back
+#lets do the manual scaling 
+  134  kubectl get deploy
+  135  kubectl scale deploy my-first-deployment --replicas=5
+  136  kubectl get deploy
+  137  kubectl get pod
+#the below command will show the replicas to save the file Press Esc :q!
+  138  kubectl edit deploy my-first-deployment
