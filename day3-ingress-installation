@@ -95,4 +95,4 @@ Events:
   Type    Reason  Age   From                      Message
   ----    ------  ----  ----                      -------
   Normal  Sync    20s   nginx-ingress-controller  Scheduled for sync
-
+##after the url put /fashion or /mobile 
