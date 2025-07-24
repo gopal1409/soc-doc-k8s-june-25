@@ -54,3 +54,30 @@ my-first-deployment-77bdf869fc-f9djv   1/1     Running   0          38m
 my-first-deployment-77bdf869fc-rwscn   1/1     Running   0          37m
 my-first-pod                           1/1     Running   0          148m
 [root@ip-172-31-115-211 ~]$
+#how to update the deployment process
+#check the name of the image the below command will update your image
+107  kubectl set image deploy my-first-deployment nginx=nginx:1.16.1
+####
+  108  kubectl get deploy
+#now if you check replicaset you will find two different replicaset one is previos version and new version
+  109  kubectl get rs
+#you can check the rollout status
+  110  kubectl rollout status deploy my-first-deployment
+  111  kubectl get pod
+  112  kubectl describe deployment
+#lets make a mistake with an image so that my deployment hang and i can rollback to previous releaxse
+  113  kubectl set image deploy my-first-deployment nginx=nginx:1.161
+#this will show that the deployment is in hang state press ctrl c
+  114  kubectl rollout status deploy my-first-deployment
+#now is you look into rs it will show that there are two replicaset in running state but the wrond deploymetn will show not availabel 
+  115  kubectl get rs
+  116  kubectl get pod
+ ##you can check all the rollout
+  120  kubectl rollout history deployment my-first-deployment
+  121  kubectl rollout history deployment my-first-deployment --revision=1
+  122  kubectl rollout history deployment my-first-deployment --revision=2
+  123  kubectl rollout history deployment my-first-deployment --revision=3
+##lets undo the deployment 
+  124  kubectl rollout undo deployment my-first-deployment
+####now check that the deployment is up and running 
+kubectl get deploy
