@@ -1,0 +1,98 @@
+#lets install the ingress controller 
+ 171  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.0/deploy/static/provider/cloud/deploy.yaml
+##once you install the ingress controller you can see the deploy and a pod against which the ingress controller is working 
+  [root@ip-172-31-115-211 ~]$ kubectl get deploy -A
+NAMESPACE       NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+ingress-nginx   ingress-nginx-controller   1/1     1            1           2m13s
+  ###lets check the pod of ingress 
+  [root@ip-172-31-115-211 ~]$ kubectl get pod -A
+NAMESPACE       NAME                                        READY   STATUS    RESTARTS        AGE
+ingress-nginx   ingress-nginx-controller-675c4bf49-dtxnb    1/1     Running   0               2m46s
+  #to check the ingress is running or not you can check the service of ingress and port number
+  #against 80 what is the port number so you can copy the node machine ip address and port number you will see the test page of ingress 
+  [root@ip-172-31-115-211 ~]$ kubectl get svc -A
+NAMESPACE       NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+
+ingress-nginx   ingress-nginx-controller             LoadBalancer   10.96.247.145    <pending>     80:31697/TCP,443:30345/TCP   3m30s
+ingress-nginx   ingress-nginx-controller-admission   ClusterIP      10.102.203.200   <none>        443/TCP                      3m29s
+##something like 404 not found
+  ###lets create two pod and two service 
+  [root@ip-172-31-115-211 ~]$ kubectl run fashion --image=nginx
+pod/fashion created
+[root@ip-172-31-115-211 ~]$ kubectl run mobile --image=httpd
+pod/mobile created
+[root@ip-172-31-115-211 ~]$
+#############
+lets expose this two pod using service
+  [root@ip-172-31-115-211 ~]$ kubectl expose pod fashion --port 80 --name fashionsrv
+service/fashionsrv exposed
+[root@ip-172-31-115-211 ~]$ kubectl expose pod mobile --port 80 --name mobilesrv
+service/mobilesrv exposed
+[root@ip-172-31-115-211 ~]$
+##once i expose it lets check the service type both the service type is cluster ip means i cannot access this two using node machine ip address or load balancer 
+  [root@ip-172-31-115-211 ~]$ kubectl get svc
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+fashionsrv         ClusterIP   10.102.61.38    <none>        80/TCP         43s
+
+mobilesrv          ClusterIP   10.107.85.227   <none>        80/TCP         24s
+
+  #lets map this two service to my ingress controller 
+
+  [root@ip-172-31-115-211 ~]$ kubectl get ingressclass
+NAME    CONTROLLER             PARAMETERS   AGE
+nginx   k8s.io/ingress-nginx   <none>       9m30s
+[root@ip-172-31-115-211 ~]$ nano ingress.yml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /fashion
+        pathType: Prefix
+        backend:
+          service:
+            name: fashionsrv
+            port:
+              number: 80
+      - path: /mobile
+        pathType: Prefix
+        backend:
+          service:
+            name: mobilesrv
+            port:
+              number: 80
+      
+
+[root@ip-172-31-115-211 ~]$ kubectl apply -f ingress.yml
+ingress.networking.k8s.io/minimal-ingress created
+[root@ip-172-31-115-211 ~]$ kubectl get ingressclass
+NAME    CONTROLLER             PARAMETERS   AGE
+nginx   k8s.io/ingress-nginx   <none>       11m
+[root@ip-172-31-115-211 ~]$ kubectl get ingress
+NAME              CLASS   HOSTS   ADDRESS   PORTS   AGE
+minimal-ingress   nginx   *                 80      12s
+[root@ip-172-31-115-211 ~]$ kubectl describe ingress
+Name:             minimal-ingress
+Labels:           <none>
+Namespace:        default
+Address:
+Ingress Class:    nginx
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *
+              /fashion   fashionsrv:80 (192.168.0.5:80)
+              /mobile    mobilesrv:80 (192.168.0.6:80)
+Annotations:  nginx.ingress.kubernetes.io/rewrite-target: /
+Events:
+  Type    Reason  Age   From                      Message
+  ----    ------  ----  ----                      -------
+  Normal  Sync    20s   nginx-ingress-controller  Scheduled for sync
+
