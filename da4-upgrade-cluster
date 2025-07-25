@@ -5,7 +5,7 @@
   411  rm -rf $HOME/.kube/config
  412  systemctl restart containerd
   413  systemctl restart kubelet
-##then we will install older version of kubernetes
+##then we will install older version of kubernetes in master node
   bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/previous/install_master.sh)
          ####once install
          #you need to reset the worker node also 
