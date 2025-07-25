@@ -1,0 +1,17 @@
+###we will expose mysql using a service
+    266  nano mysqlsrv.yml
+  ##############
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql 
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+  clusterIP: None
+  267  kubectl apply -f mysqlsrv.yml
+    ####look into the cluster ip service see if you can find something interesting
+  268  kubectl get svc
+  269  kubectl describe svc mysql
