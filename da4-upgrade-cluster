@@ -23,3 +23,43 @@ NAME                STATUS   ROLES           AGE     VERSION
 ip-172-31-115-211   Ready    control-plane   5m55s   v1.31.9
 ip-172-31-115-227   Ready    <none>          4m18s   v1.31.9
 ##thiw will show the older version of k8s
+
+#lets upgrade the master node or control plane to a new version
+#after drain change the name of the host to your master node host 
+node/ip-172-31-115-211 cordoned
+Warning: ignoring DaemonSet-managed Pods: kube-system/kube-proxy-lf57s, kube-system/weave-net-sh7wq
+evicting pod kube-system/coredns-7c65d6cfc9-qckp5
+evicting pod kube-system/coredns-7c65d6cfc9-gwbt7
+pod/coredns-7c65d6cfc9-qckp5 evicted
+pod/coredns-7c65d6cfc9-gwbt7 evicted
+node/ip-172-31-115-211 drained
+#once drain 
+[root@ip-172-31-115-211 ~]$ kubectl get nodes
+NAME                STATUS                     ROLES           AGE   VERSION
+ip-172-31-115-211   Ready,SchedulingDisabled   control-plane   36m   v1.31.9
+ip-172-31-115-227   Ready                      <none>          35m   v1.31.9
+[root@ip-172-31-115-211 ~]$
+##msater node scheduling diable
+[root@ip-172-31-115-211 ~]$ killall -s SIGTERM kube-apiserver
+[root@ip-172-31-115-211 ~]$
+#####lets update the ubuntu system
+[root@ip-172-31-115-211 ~]$ sudo apt update
+sudo apt-cache madison kubeadm
+##this will show the latest version of k8s. 
+[root@ip-172-31-115-211 ~]$ apt-cache show kubeadm | grep 1.32
+Version: 1.32.7-1.1
+##############
+[root@ip-172-31-115-211 ~]$ sudo apt-mark unhold kubeadm
+kubeadm was already not on hold.
+###########once hold the kubeadm 
+[root@ip-172-31-115-211 ~]$ apt install kubeadm=1.32.7-1.1
+Reading package lists... Done
+##we need to also update the kubectl and kubelet
+ 439  apt install kubeadm=1.32.7-1.1
+  440  apt install kubectl=1.32.7-1.1 kubelet=1.32.7-1.1
+  441  kubeadm version
+###lets run the upgrade plan
+ kubeadm upgrade plan
+##check the latest version and apply it 
+ kubeadm upgrade apply v1.32.7
+
