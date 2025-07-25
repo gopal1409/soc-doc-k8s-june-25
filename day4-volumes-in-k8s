@@ -108,4 +108,82 @@ CREATE DATABASE webappdb;
 
 ##you will see that in configmap whatever data we have put it is visible. 
 
+[root@ip-172-31-115-211 ~]$ nano mysql.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql 
+spec:
+  selector:
+    matchLabels:
+      app: mysql 
+  template:
+    metadata:
+      labels:
+        app: mysql 
+    spec:
+      containers:
+      - name: mysql 
+        image: mysql:5.6
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-db-password #this is the name of the secret we create
+              key: dbpass #in the secret file we have the key as dbpass
+        volumeMounts: #it is inside the container
+        - name: mysql-volume 
+          mountPath: /var/lib/mysql 
+        - name: db-script 
+          mountPath: /docker-entrypoint-initdb.d #this is the path 
+
+        
+        ports:
+        - containerPort: 3306
+      volumes: #it is outside the container
+      - name: mysql-volume
+        persistentVolumeClaim:
+          claimName: task-pv-claim #ame of the persistent volume claim we create
+      - name: db-script 
+        configMap:
+          name: usermanagement-db-script #we create
+[root@ip-172-31-115-211 ~]$ kubectl apply -f mysql.yml
+deployment.apps/mysql created
+[root@ip-172-31-115-211 ~]$
+###lets verify the same 
+[root@ip-172-31-115-211 ~]$ kubectl get deploy
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+mysql   1/1     1            1           52s
+[root@ip-172-31-115-211 ~]$ kubectl get pod
+NAME                     READY   STATUS    RESTARTS       AGE
+
+mysql-55744bfbb6-7tbbc   1/1     Running   0              56s
+[root@ip-172-31-115-211 ~]$
+###lets login inside the pod you need to change the pod id as per your id 
+[root@ip-172-31-115-211 ~]$ kubectl exec -it mysql-55744bfbb6-7tbbc -- /bin/bash
+root@mysql-55744bfbb6-7tbbc:/#
+##lets login inside mysql database password will be dbpassword11
+root@mysql-55744bfbb6-7tbbc:/# mysql -u root -p
+Enter password:
+##once you loged in you need to check the configmap database is created or not 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| webappdb  
+###finally 
+exit
+exit
+###########lets verify the folder is created on the second machine in /mnt/data
+t@ip-172-31-115-227 ~]$ cd /mnt/data
+[root@ip-172-31-115-227 data]$ ls
+auto.cnf  ib_logfile0  ib_logfile1  ibdata1  mysql  performance_schema  webappdb
+[root@ip-172-31-115-227 data]$
+
+
+
+
 
