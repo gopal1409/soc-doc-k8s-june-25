@@ -1,3 +1,5 @@
+####
+sudo -i
 #######lets create a namespace and allocate quota to that particular namespace
   [root@ip-172-31-115-211 ~]$ kubectl create ns dev
 namespace/dev created
