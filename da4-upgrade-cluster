@@ -26,6 +26,7 @@ ip-172-31-115-227   Ready    <none>          4m18s   v1.31.9
 
 #lets upgrade the master node or control plane to a new version
 #after drain change the name of the host to your master node host 
+ 432  kubectl drain ip-172-31-115-211 --ignore-daemonsets --delete-emptydir-data
 node/ip-172-31-115-211 cordoned
 Warning: ignoring DaemonSet-managed Pods: kube-system/kube-proxy-lf57s, kube-system/weave-net-sh7wq
 evicting pod kube-system/coredns-7c65d6cfc9-qckp5
