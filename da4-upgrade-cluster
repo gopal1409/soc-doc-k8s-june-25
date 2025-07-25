@@ -1,0 +1,25 @@
+##lets reset the cluster then upgrade it 
+  sudo -i
+   409  kubeadm reset
+  410  rm -rf /etc/cni/net.d
+  411  rm -rf $HOME/.kube/config
+ 412  systemctl restart containerd
+  413  systemctl restart kubelet
+##then we will install older version of kubernetes
+  bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/previous/install_master.sh)
+         ####once install
+         #you need to reset the worker node also 
+           409  kubeadm reset
+  410  rm -rf /etc/cni/net.d
+  411  rm -rf $HOME/.kube/config
+          412  systemctl restart containerd
+  413  systemctl restart kubelet
+  bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/previous/install_worker.sh)
+    ##once you install the older version of k8s in the worker node 
+
+      ##go back to the master machine 
+         [root@ip-172-31-115-211 ~]$ kubectl get nodes
+NAME                STATUS   ROLES           AGE     VERSION
+ip-172-31-115-211   Ready    control-plane   5m55s   v1.31.9
+ip-172-31-115-227   Ready    <none>          4m18s   v1.31.9
+##thiw will show the older version of k8s
