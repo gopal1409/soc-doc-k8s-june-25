@@ -1,6 +1,6 @@
 ##first we will login to the third machine or the worker node and create a folder 
   sudo -i
-   36  cd /root/.kube
+   
    37  mkdir /mnt/data
 #############################################
   #lets do all the other activity from the second machine or the master node
