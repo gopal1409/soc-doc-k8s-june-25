@@ -63,4 +63,13 @@ Reading package lists... Done
  kubeadm upgrade plan
 ##check the latest version and apply it 
  kubeadm upgrade apply v1.32.7
+#once it is successfully upgrade the cluster 
+[upgrade] SUCCESS! A control plane node of your cluster was upgraded to "v1.32.7".
+##lets uncordon the master node
+ 449  kubectl uncordon ip-172-31-115-211
+  450  systemctl restart containerd
+  451  systemctl restart kubelet
+  452  kubectl get nodes -o wide
+
+
 
