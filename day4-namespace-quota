@@ -1,0 +1,113 @@
+#######lets create a namespace and allocate quota to that particular namespace
+  [root@ip-172-31-115-211 ~]$ kubectl create ns dev
+namespace/dev created
+[root@ip-172-31-115-211 ~]$ kubectl describe ns dev
+Name:         dev
+Labels:       kubernetes.io/metadata.name=dev
+Annotations:  <none>
+Status:       Active
+
+No resource quota.
+
+No LimitRange resource.
+[root@ip-172-31-115-211 ~]$
+
+##lets allocate quota in this namespace
+  [root@ip-172-31-115-211 ~]$ nano dev.yml
+apiVersion: v1 
+kind: ResourceQuota
+metadata:
+  name: mem-cpu-quota
+  namespace: dev 
+#inside the dev namespace 
+spec:
+  hard:
+    requests.cpu: "1" #every pod can request or guranteed that they can use 1Core of RAM
+    requests.memory: "1Gi"
+    limits.cpu: "2" #the pod can use max 2 core processor
+    limits.memory: "2Gi"
+#request means all the time inside my pod a container will get this much cpu and memory
+  #limite means the maximum amount of cpu and memory a container can use
+[root@ip-172-31-115-211 ~]$ kubectl apply -f dev.yml
+resourcequota/mem-cpu-quota created
+[root@ip-172-31-115-211 ~]$ kubectl describe ns dev
+Name:         dev
+Labels:       kubernetes.io/metadata.name=dev
+Annotations:  <none>
+Status:       Active
+
+Resource Quotas
+  Name:            mem-cpu-quota
+  Resource         Used  Hard
+  --------         ---   ---
+  limits.cpu       0     2
+  limits.memory    0     2Gi
+  requests.cpu     0     1
+  requests.memory  0     1Gi
+
+No LimitRange resource.
+[root@ip-172-31-115-211 ~]$
+
+#lets create a pod and utlized the resources 
+[root@ip-172-31-115-211 ~]$ nano q.yml
+apiVersion: v1 
+
+kind: Pod
+metadata:
+  name: quota-pod-1
+  namespace: dev
+spec:
+  containers:
+  - name: quota-pod-1 
+    image: nginx 
+    resources:
+      limits:
+        memory: "800Mi"
+        cpu: "800m"
+      requests:
+        memory: "600Mi" 
+        cpu: "400m"
+    ports:
+      - containerPort: 80
+
+
+See 'kubectl apply -h' for help and examples
+[root@ip-172-31-115-211 ~]$ kubectl apply -f q.yml
+pod/quota-pod-1 created
+#it has been created in dev namespace so it will not be visilble 
+         227  kubectl get pod
+        ##ytou need to provide the dev namespace then only i can see the utlization
+  
+  229  kubectl -n dev get pod
+        ##this describe ns will show the utilization report
+  230  kubectl describe ns dev
+    #lets create a pod to over utlzied the resource 
+    nano q2.yml
+    ###################
+apiVersion: v1 
+
+kind: Pod
+metadata:
+  name: quota-pod-2
+  namespace: dev
+spec:
+  containers:
+  - name: quota-pod-2
+    image: nginx 
+    resources:
+      limits:
+        memory: "1Gi"
+        cpu: "800m"
+      requests:
+        memory: "700Mi" # This pod requests more memory than quota allows
+        cpu: "400m"
+    ports:
+      - containerPort: 80
+#lets apply the same 
+  kubeclt apply -f q2.yml
+    ##check the error 
+        [root@ip-172-31-115-211 ~]$ kubectl apply -f q2.yml
+Error from server (Forbidden): error when creating "q2.yml": pods "quota-pod-2" is forbidden: exceeded quota: mem-cpu-quota, requested: requests.memory=700Mi, used: requests.memory=600Mi, limited: requests.memory=1Gi
+
+
+
